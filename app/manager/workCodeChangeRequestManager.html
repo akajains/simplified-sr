@@ -1,0 +1,145 @@
+	<div class="container ng-scope">
+			<div class="col-md-12">
+				<form class="form-horizontal" #f="ngForm" (ngSubmit)='submitWorkCodeChanges(f)' >
+				<fieldset>
+					<h3 class="margin-bottom-50">{{title}}</h3>					
+					<h3>Hi Zoe,</h3>
+					<p>This form allows you to request the the re-assignment of a workcode to an individual in your team</p>
+
+					<hr>
+					<div class="form-group">
+						<label class="col-md-4 control-label" for="">Enter the name or ID of the employee whose workcode requires changing</label>  
+						<div class="col-md-4">
+							<input class="form-control" min-chars="3" auto-complete [(ngModel)]="searchTerm" [source]="countries" name="st" />
+							<input class="form-control" type="text" name="searchTerm" placeholder="23270409 or Mary Smith" [(ngModel)]="searchTerm" #spy #employeeId="ngModel">
+							<br> 
+							<!--<br>TODO: remove this: {{spy.className}} --{{employeeId.dirty}}-->
+							<p *ngIf="employeeSelected == false && employeeId.touched"> Unable to find an employee with that ID number (who reports through to you)</p>
+						</div>
+						<div class="col-md-4">								
+							<button name="findEmployee" class="btn fa fa-search" (click)="findEmployee()" type="button">Find</button>
+						</div>
+					</div>
+
+					<div *ngIf="employeeSelected">	<!--- EMPLOYEE HAS BEEN SELECTED -->
+						<hr>
+
+						<div class="form-group">
+							<label class="col-md-4 control-label" for="">Employee Number</label>  
+							<div class="col-md-4">
+								<input class="form-control input-md" type="text" disabled="true" [value]="empMdl.id">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label class="col-md-4 control-label" for="">Employee Name</label>
+							<div class="col-md-4">
+								<input class="form-control input-md" type="text" disabled="true" [value]="empMdl.fullName">
+							</div>
+						</div>
+
+						<div class="row">
+							<label class="col-md-4 control-label" for="">Current Workcode</label>
+							<div class="col-md-4">
+								<input class="form-control input-md" type="text" name="workCode" disabled="true" [value]="empMdl.workCode">
+							</div>
+						</div>
+
+						<div class="row">
+							<label class="col-md-4 control-label" for="">New Workcode</label>
+							<div class="col-md-4">
+								<input class="form-control input-md" type="text" [(ngModel)] = "empMdl.newWorkCode" name="newWorkCode" placeholder="BZPRJSPC" >
+								<p style="color: red;">Unable to match the workcode</p>
+							</div>
+							<div class="col-md-4">
+								<button class="btn" type="button" (click)="validateWorkCode()" >Valid?</button>
+							</div>
+						</div>
+
+						<div class="row">
+							<label class="col-md-4 control-label" for="">New Workcode Description</label>
+							<div class="col-md-4">
+								<input class="form-control input-md" type="text" [(ngModel)] = "empMdl.newWorkCodeDesc" name="newWorkCodeDesc" disabled="true">
+							</div>
+						</div>
+
+						<div class="row" >
+							<label class="col-md-4 control-label" for="textinput">Effective change date</label>  
+							<div class="col-md-4">
+								<input name="changeDate" class="form-control input-md" [(ngModel)]="empMdl.changeDate" id="textinput" type="date" >
+							</div>
+							<p class="col-md-4">The date from which this workcode change will be effective</p>
+						</div>
+
+						<div class="form-group row" >
+							<label class="control-label col-xs-12 col-sm-4" for="changereason">What is the reason for the workcode change?</label>
+							<div class="col-xs-12 col-sm-4">
+								<div class="radio">
+									<label for="reason1">
+										<input name="reason" id="reason1" [(ngModel)] = "empMdl.reason" type="radio" value="1" required> System error - workcode was entered incorrectly during recent recruitment
+									</label>
+									<br>
+									<label for="reason2">
+										<input name="reason" id="reason2" [(ngModel)] = "empMdl.reason" type="radio" value="2" required> Role reclassification - the employees' role has changed overtime
+									</label>
+									<br>
+									<label for="reason3">
+										<input name="reason" id="reason3" [(ngModel)] = "empMdl.reason" type="radio" value="3" required> Workcode Delimitation - the workcode is being removed
+									</label>
+								</div>
+							</div>
+							<p class="col-md-4">Select the primary reason that this change is required</p>
+						</div>
+
+						<div class="row">						
+							<label class="col-md-4 control-label" for="radios">Does this change impact the employee's rem-range?</label>
+							<div class="col-md-4">
+								<div class="radio">
+									<label for="radios-0">
+										<input name="remRange" id="radios-0" type="radio" [(ngModel)] = "empMdl.remImpacted" value="1" required> Yes
+									</label>
+									<br>
+									<label for="radios-1">
+										<input name="remRange" id="radios-1" type="radio" [(ngModel)] = "empMdl.remImpacted" value="2" required> No
+									</label>
+								</div>
+							</div>
+							<p  class="col-md-4">If this change will impact the employee's remuneration, please confirm that you have received approval from your HR Business Partner prior to submitting this form</p>
+						</div>
+
+						<br>					
+						<div class="row">
+							<div class="row form-group">
+								<div class="col-xs-12 col-sm-4 control-label">
+									<label for="checkone">I have gained HRBP approval</label>
+								</div>
+								<div class="col-xs-12 col-sm-4">
+									<input type="checkbox" name="checkone" [(ngModel)] = "empMdl.hrbpApproved">
+								</div>
+							</div>
+						</div>						
+
+						<div class="row form-group">
+							<div class="col-xs-12 col-sm-4 col-md-4 control-label">
+								<label for="businessjustification">Business Justification</label>
+							</div>
+							<div class="col-xs-12 col-sm-4 col-md-4" >
+								<textarea style="border: 1px solid #333;" [(ngModel)]="empMdl.businessJustification" class="form-control" rows="8" name="businessJustification" id="businessjustification" required></textarea>
+							</div>
+							<p class="col-md-4">Please enter the business justification for the requested workcode change.</p>
+						</div>
+					</div> <!--- END EMPLOYEE HAS BEEN SELECTED -->
+					<hr>
+					<div class="form-group">
+						<div class="col-md-6 col-md-offset-4">
+							<button type="submit" class="btn btn-primary" id="singlebutton">Submit</button>
+							<!--<button type="submit" class="btn btn-primary" id="singlebutton">Cancel</button>-->
+							<a class="btn btn-danger btn-hover margin-left-20" href="index.html">Cancel</a>
+						</div>
+					</div>
+				</fieldset>
+				</form>
+			</div>
+		</div>
+		
+		{{diagnostic()}}
